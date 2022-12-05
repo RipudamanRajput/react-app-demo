@@ -3,7 +3,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 
-const Insert = require('./Querries/Insert/Insert');
+const  Insert  = require('./Querries/Insert/Insert');
 const Find = require('./Querries/Find/Find');
 const upload = require('./Querries/Uploadassets/UploadFile');
 const update = require('./Querries/Updatedata/update');
@@ -35,17 +35,21 @@ app.get('/home', (req, res) => {
 // ------- API for signup user
 app.post('/create', (req, res) => {
     // to send message in response
-    const newDetail = {
-        fname: req.body.fname,
-        lname: req.body.lname,
-        password: req.body.password,
-        DOB: req.body.DOB,
-        gender: req.body.gender,
-        agree: req.body.agree,
-        step: req.body.step,
-        profilepic: ""
+    const query = {
+        data: {
+            fname: req.body.fname,
+            lname: req.body.lname,
+            password: req.body.password,
+            DOB: req.body.DOB,
+            gender: req.body.gender,
+            agree: req.body.agree,
+            step: req.body.step,
+            profilepic: ""
+        },
+        dbname: "admin",
+        collection: "customers"
     };
-    Insert(newDetail).then((data, err) => {
+    Insert(query).then((data, err) => {
         res.status(200).send({ data: data })
     })
     detail.push(newDetail);
@@ -54,8 +58,12 @@ app.post('/create', (req, res) => {
 // ------- API for Login User
 app.post('/Login', (req, res) => {
     const body = {
-        fname: req.body.fname,
-        password: req.body.password
+        data: {
+            fname: req.body.fname,
+            password: req.body.password
+        },
+        dbname: "admin",
+        collection: "customers"
     }
     Find(body).then((data, err) => {
         res.status(200).send({ data: data })
@@ -65,9 +73,13 @@ app.post('/Login', (req, res) => {
 // ------- User Info API
 app.post('/detail', (req, res) => {
     const body = {
-        fname: req?.body?.fname,
-        DOB: req?.body?.DOB,
-        lname: req?.body?.lname
+        data: {
+            fname: req?.body?.fname,
+            DOB: req?.body?.DOB,
+            lname: req?.body?.lname
+        },
+        dbname: "admin",
+        collection: "customers"
     }
     Find(body).then((data, err) => {
         if (err) throw err;
@@ -136,9 +148,19 @@ app.post('/stepchange', (req, res) => {
 })
 
 // --------- create profile with secific user 
-// app.post('/CreateProfiele',(req,res)=>{
-
-// })
+app.post('/CreateProfiele', (req, res) => {
+    const query = {
+        data: {
+            name: req.body.name,
+            category: req.body.category,
+            rules: req.body.rules,
+            status: req.body.status
+        },
+        dbname: "admin",
+        collection: "Profiles"
+    }
+    Insert(query)
+})
 
 // ------ banckend running at this port 
 

@@ -1,7 +1,9 @@
-import { Card, Page, Stack, TextField, Tag, Modal, Button, TextStyle, Select } from "@shopify/polaris";
+import { Card, Page, Stack, TextField, Tag, Modal, Button, TextStyle, Select, Toast } from "@shopify/polaris";
 import React, { useState } from "react";
 import { Space, Table } from 'antd';
 import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
+import axios from "axios";
 
 function Profile(props) {
     const history = useNavigate();
@@ -101,9 +103,21 @@ function Profile(props) {
 
     const { name, category, rules, status } = addprofile
     const addprofiledetail = ({ name, category, rules, status }) => {
+        const data ={name,category,rules,status}
         if (!name, !category, !rules, !status) {
-            console.error('errr')
+            // swal({
+            //     title: "Fill All Fields",
+            //     icon: "warning",
+            //     buttons: {
+            //       catch: {
+            //         text: "Cancel",
+            //         value: "catch",
+            //       }
+            //     }
+            //   })
+           
         }
+        axios.post('http://localhost:3002/CreateProfiele',data)
     }
     return (
         <>
@@ -146,7 +160,6 @@ function Profile(props) {
                                     Name
                                 </TextStyle>
                                 <TextField
-                                error={name}
                                     placeholder="Enter Name "
                                     value={addprofile?.name}
                                     onChange={(text) => {

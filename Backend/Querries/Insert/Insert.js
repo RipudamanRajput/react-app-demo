@@ -7,20 +7,16 @@ function Insert(data) {
     let promise = new Promise((resolve, reject) => {
         MongoClienrt.connect(Url, function (err, db) {
             if (err) throw err;
-            var dbo = db.db("admin");
+            var dbo = db.db(data?.dbname);
 
-            const pass = {
-                password: data.password
-            }
-            Find(pass).then((res, err) => {
+            Find(data).then((res, err) => {
 
                 if (res?._id) {
                     resolve(false)
 
                 } else {
                     resolve(true)
-                    console.log(res)
-                    dbo.collection("customers").insertOne(data, (err, res) => {
+                    dbo.collection(`${data?.collection}`).insertOne(data?.data, (err, res) => {
                         if (err) throw err;
                         db.close();
                     })
@@ -34,4 +30,4 @@ function Insert(data) {
 }
 
 
-module.exports = Insert;
+module.exports =  Insert ;
