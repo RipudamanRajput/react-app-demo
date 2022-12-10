@@ -8,7 +8,6 @@ function Insert(data) {
         MongoClienrt.connect(Url, function (err, db) {
             if (err) throw err;
             var dbo = db.db(data?.dbname);
-
             Find(data).then((res, err) => {
 
                 if (res?._id) {
@@ -26,7 +25,7 @@ function Insert(data) {
 
 
     });
-    return promise
+    return promise;
 }
 
 

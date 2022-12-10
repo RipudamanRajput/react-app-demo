@@ -16,7 +16,7 @@ function Faq() {
                 <Stack vertical spacing="loose">
                     {[1, 2, 3].map((data, index) => {
                         return (
-                            <>
+                            <Card subdued key={index}>
                                 <Button
                                     fullWidth
                                     ariaControls={`collapse ${index}`}
@@ -40,7 +40,7 @@ function Faq() {
                                         <Link url="#">Test link</Link>
                                     </TextContainer>
                                 </Collapsible>
-                            </>
+                            </Card>
                         )
                     })
                     }

@@ -49,7 +49,12 @@ function Login() {
     axios.post('http://localhost:3002/Login', cred)
       .then((res, error) => {
         if (error) throw error;
-        res.data.data ?
+        const {_id,fname,lname,DOB,profilepic, step, gender} =res.data[0]
+       
+        const data = {
+          _id,fname,lname,DOB,profilepic, step, gender
+        }
+        res.data ?
           (
             swal({
               title: "Login Successful",
@@ -65,6 +70,7 @@ function Login() {
                 if (value) {
                   setstep(cred,1);
                   history("/panel/Dashboard")
+                  window.location.reload()
                 }
               })
 
@@ -75,7 +81,7 @@ function Login() {
             icon: "error",
           });
 
-        localStorage.setItem("Data", JSON.stringify(res.data));
+        localStorage.setItem("Data", JSON.stringify(data));
 
       })
       .catch(err => {

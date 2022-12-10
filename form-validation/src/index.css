@@ -107,3 +107,29 @@ span.profile-change-icon {
   width: 100%;
   max-width: 40rem;
 }
+
+/* topbar avtar css */
+img.Polaris-Avatar--hidden {
+  visibility: visible !important;
+}
+
+/* empty states */
+.Emptystate {
+  height: 100vh;
+  display: flex;
+  place-items: center;
+  padding: 0 6.5rem;
+}
+
+.Emptystate>.Polaris-Card {
+  width: 100%;
+}
+
+/* add aproduct */
+span.varinet-image {
+  display: block;
+}
+
+span.varinet-image .Polaris-DropZone {
+  min-height: fit-content;
+}

@@ -1,21 +1,35 @@
-import { Card, DropZone, Icon, Modal, Stack, TextStyle, TopBar } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import { Avatar, Card, DropZone, Icon, Modal, Stack, TextStyle, TopBar } from "@shopify/polaris";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { EditMajor, } from '@shopify/polaris-icons';
 import axios from "axios";
 
 function TopbarPannel(props) {
-    const { fname, lname, _id, gender, DOB, profilepic } = props.data;
+    const { fname, lname, _id, gender, DOB } = props.data;
 
     const [editmodal, seteditmodal] = useState(false);
     const [editprfile, seteditprofile] = useState(false);
     const [img, setimg] = useState();
+    const [profilepicimg, setprofilepicimg] = useState();
 
     const history = useNavigate();
     const userID = useSelector((state) => state.login.username)
     const [menuopen, setmenuopen] = useState(false)
 
+    const changeprofile = () => {
+        axios.post('http://localhost:3002/detail', { fname, lname, DOB }).then((res, err) => {
+            if (err) throw err;
+            if (res.data) {
+                res.data.data.forEach(element => {
+                    setprofilepicimg(element.profilepic)
+                });
+            }
+        })
+    }
+    useEffect(() => {
+        changeprofile()
+    }, [editmodal])
 
     // file upload fun..
     const apidata = (data) => {
@@ -42,14 +56,12 @@ function TopbarPannel(props) {
                 .then((res, err) => {
                     if (err) throw err;
                     apidata(res.data)
-                    props.setprofile(res.data)
-
+                    changeprofile();
                 })
                 .catch((err) => {
                     console.log("errorro", err)
                 })
     }, [],);
-
 
     return (
         <>
@@ -64,6 +76,7 @@ function TopbarPannel(props) {
                                     onAction: () => {
                                         history('/login')
                                         localStorage.removeItem('Data')
+                                        window.location.reload()
                                     }
                                 },
                                 {
@@ -75,9 +88,9 @@ function TopbarPannel(props) {
                             ]
                         },
                     ]}
-                    name={`${userID.fname}`}
-                    detail={`${userID._id}`}
-                    avatar={profilepic}
+                    name={`${userID?.fname}`}
+                    detail={`${userID?._id}`}
+                    avatar={profilepicimg}
                     initials={`${userID?.fname?.substring(0, 1)}`}
                     open={menuopen}
                     onToggle={() => { setmenuopen(!menuopen) }}
@@ -100,7 +113,7 @@ function TopbarPannel(props) {
                                     </span>
                                     : <>
                                         <img
-                                            src={img?.Imginfo?.url ? img?.Imginfo?.url : profilepic}
+                                            src={img?.Imginfo?.url ? img?.Imginfo?.url : profilepicimg}
                                             height={200}
                                             width={200}
                                             alt="Profile pic" />

@@ -5,10 +5,10 @@ function Update(data) {
     let promise = new Promise((resolve, reject) => {
         MongoClienrt.connect(Url, (err, db) => {
             if (err) throw err;
-            var dbo = db.db('admin');
+            var dbo = db.db(data?.dbname);
             var myquery = data?.query;
             var newvalue = { $set: data?.data }
-            dbo.collection("customers").updateOne(myquery, newvalue, (err, res) => {
+            dbo.collection(data?.collection).updateOne(myquery, newvalue, (err, res) => {
                 if (err) {
                     reject(new Error(err))
                 }

@@ -3,10 +3,11 @@ const logger = require('morgan');
 const cors = require('cors');
 const fs = require('fs');
 
-const  Insert  = require('./Querries/Insert/Insert');
+const Insert = require('./Querries/Insert/Insert');
 const Find = require('./Querries/Find/Find');
 const upload = require('./Querries/Uploadassets/UploadFile');
 const update = require('./Querries/Updatedata/update');
+const Delete = require('./Querries/Delete/Delete');
 
 
 const app = express();
@@ -31,6 +32,8 @@ app.get('/home', (req, res) => {
     // console.log('Book : ', JSON.stringify(detail));
     res.end(JSON.stringify(detail));
 });
+
+// --------------------------------------------------------------------------- Authenticatio APIS
 
 // ------- API for signup user
 app.post('/create', (req, res) => {
@@ -66,9 +69,12 @@ app.post('/Login', (req, res) => {
         collection: "customers"
     }
     Find(body).then((data, err) => {
-        res.status(200).send({ data: data })
+        res.status(200).send(data)
     })
 })
+
+
+// -------------------------------------------------------------------------- User Info APIS
 
 // ------- User Info API
 app.post('/detail', (req, res) => {
@@ -97,7 +103,9 @@ app.post('/upload', upload().single('image'), (req, res, next) => {
                 query: JSON.parse(req?.body?.data),
                 data: {
                     profilepic: `data:image/png;base64,${Buffer.from(data).toString('base64')}`
-                }
+                },
+                dbname: "admin",
+                collection: "customers"
             }
             update(query).then((data, err) => {
                 if (err) throw err;
@@ -137,7 +145,9 @@ app.post('/stepchange', (req, res) => {
         // data that need to be replaced in db 
         data: {
             step: req?.body?.step
-        }
+        },
+        dbname: "admin",
+        collection: "customers"
     }
     update(query).then((data, err) => {
         if (err) throw err;
@@ -147,10 +157,13 @@ app.post('/stepchange', (req, res) => {
     })
 })
 
+// ---------------------------------------------------------------------------- Profiles APIS
+
 // --------- create profile with secific user 
 app.post('/CreateProfiele', (req, res) => {
     const query = {
         data: {
+            userId: req.body.userId,
             name: req.body.name,
             category: req.body.category,
             rules: req.body.rules,
@@ -159,10 +172,64 @@ app.post('/CreateProfiele', (req, res) => {
         dbname: "admin",
         collection: "Profiles"
     }
-    Insert(query)
+    Insert(query).then((data, err) => {
+        if (err) throw err;
+        res.status(200).send({
+            status: "Profile Created Sucessfully"
+        })
+    })
 })
 
-// ------ banckend running at this port 
+// ------- API for all profile list
+app.post('/allProfiles', (req, res) => {
+    const body = {
+        data: {
+            userId: req.body.userId
+        },
+        dbname: "admin",
+        collection: "Profiles",
+    }
+    Find(body).then((data, err) => {
+        if (err) throw err;
+        res.status(200).send({
+            status: data
+        })
+    })
+})
+
+// ----- delete specific profile
+app.post('/deleteProfile', (req, res) => {
+    const query = {
+        data: {
+            name: req.body.name,
+            category: req.body.category,
+            rules: req.body.rules
+        },
+        collection: "Profiles",
+        dbname: "admin"
+    }
+    Delete(query).then((data, err) => {
+        if (err) throw err;
+        res.status(200).send({
+            status: data
+        })
+    });
+})
+
+// ------ update specific profile
+app.post('/updateProfile', (req, res) => {
+    update(req.body.data).then((data, err) => {
+        if (err) throw err;
+        res.status(200).send({
+            status: data
+        })
+    })
+})
+
+// -------------------------------------------------------------------------- Product APIS
+
+
+// -----------------------------------------------------------------------------  banckend running at this port 
 
 app.listen(3002, '0.0.0.0', () => {
     console.log('server Listing on port 3002');

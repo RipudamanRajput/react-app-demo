@@ -1,8 +1,10 @@
-import { Frame, TextStyle, Loading } from "@shopify/polaris";
-import axios from "axios";
+import { Frame, TextStyle, Loading, } from "@shopify/polaris";
 import React, { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Route, Routes, } from "react-router-dom";
+import SessionExpire from "../Emptystate/Sessionexpire";
 import Dashboard from "./Dashboard/Dashboard";
+import AddnewProduct from "./Product/Components/AddnewProduct";
 import Product from "./Product/Product";
 import Viewprofile from "./Profile/Components/Viewprofile";
 import Profile from "./Profile/Profile";
@@ -10,26 +12,13 @@ import Sidebar from "./Sidebar/sidebar";
 import Topbar from "./TopBar/TopbarPannel";
 
 function Panel(props) {
+    const userinfo = useSelector((state) => state.login.username);
+    const { DOB, fname, lname, gender, _id, profilepic } = userinfo;
     const [detail, setdetail] = useState();
-    const [profile, setprofile] = useState();
-    const { fname, lname, DOB } = props.data;
-
-    const data = {
-        fname: fname,
-        lname: lname,
-        DOB: DOB
-    }
 
     useEffect(() => {
-        axios.post('http://localhost:3002/detail', data)
-            .then((res, err) => {
-                if (err) throw err;
-                setdetail(res.data)
-            })
-
-    }, [profile])
-
-
+        setdetail({ DOB, fname, lname, gender, _id, profilepic })
+    }, [])
 
     const logo = {
         width: 124,
@@ -41,40 +30,45 @@ function Panel(props) {
     return (
 
 
-        detail ?
-            <>
-                <div style={{ height: '80px' }}>
+        props?.data ?
+            (detail ?
+                (
                     <Frame
                         topBar={<Topbar
-                            setprofile={setprofile}
-                            data={detail?.data} />}
+                            data={detail} />}
                         logo={logo}
                         navigation={<Sidebar />} >
                         <Routes>
                             <Route
                                 path='/dashboard'
-                                element={<Dashboard data={detail?.data} setprofile={setprofile} />} />
+                                element={<Dashboard data={detail} />} />
                             <Route
                                 path="/Profile"
-                                element={<Profile data={detail?.data} />} />
+                                element={<Profile data={detail} />} />
                             <Route
                                 path="/Products"
-                                element={<Product data={detail?.data} />} />
+                                element={<Product data={detail} />} />
                             <Route
                                 path="/Profile/View"
                                 element={<Viewprofile />} />
+                            <Route
+                                path="/Products/Add"
+                                element={<AddnewProduct />} />
                             <Route path="*" element={<TextStyle>404 page not found </TextStyle>} />
                         </Routes>
                     </Frame>
-                </div>
+                )
 
-
-            </>
+                :
+                (
+                    <Frame>
+                        <Loading />
+                    </Frame>
+                )
+            )
             :
 
-            <Frame>
-                <Loading />
-            </Frame>
+            <SessionExpire />
 
 
 
