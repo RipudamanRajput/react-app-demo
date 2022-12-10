@@ -1,8 +1,10 @@
 import { Button, Card, ChoiceList, Popover, Stack, TextField } from "@shopify/polaris";
 import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UserContext } from '../Product'
 
 function ProductGrid() {
+    const history = useNavigate()
     const [open, setopen] = useState(false);
     const { setSearch, Search, action, setaction } = useContext(UserContext);
     return (
@@ -38,6 +40,10 @@ function ProductGrid() {
                             onChange={(data) => { setaction(data) }}
                         />
                     </Popover>
+                    <Button 
+                    onClick={()=>history('Add')}>
+                        Add product
+                    </Button>
                 </Stack>
             </Card.Section>
         </Card>

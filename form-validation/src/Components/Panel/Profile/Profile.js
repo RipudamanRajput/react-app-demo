@@ -1,9 +1,14 @@
 import { Card, Page, Stack, TextField, Tag, Modal, Button, TextStyle, Select } from "@shopify/polaris";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Space, Table } from 'antd';
 import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
+import axios from "axios";
+import Editprofile from "./Components/Editprofile";
+import { useSelector } from "react-redux";
 
 function Profile(props) {
+    const userId = useSelector((state) => state.login.username._id)
     const history = useNavigate();
     const [modal, setmodal] = useState(false);
     const [cretapop, setcretpop] = useState(false);
@@ -13,6 +18,11 @@ function Profile(props) {
         rules: "",
         status: ""
     });
+    const [data, setdata] = useState();
+    const [search, setsearch] = useState();
+    const [row, setrow] = useState(data);
+    const [editmodaldata, seteditmodaldata] = useState(false);
+    const [openedit, setopenedit] = useState(false)
 
     const viewprofile = (data) => {
         history("View", {
@@ -69,42 +79,79 @@ function Profile(props) {
             render: (_, record) => (
                 <Space size="middle">
                     <a onClick={() => viewprofile(record)}>View</a>
-                    <a>Edit</a>
+                    <a
+                        onClick={() => {
+                            seteditmodaldata(record)
+                            setopenedit(true)
+                        }}
+                    >Edit</a>
                 </Space>
             ),
         },
     ];
 
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            category: 32,
-            rules: 'New York No. 1 Lake Park',
-            tags: 'View rule',
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            category: 42,
-            rules: 'London No. 1 Lake Park',
-            tags: 'View rule',
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            category: 32,
-            rules: 'Sidney No. 1 Lake Park',
-            tags: 'View rule',
-        },
-    ];
-
-    const { name, category, rules, status } = addprofile
     const addprofiledetail = ({ name, category, rules, status }) => {
+        const data = { userId, name, category, rules, status }
         if (!name, !category, !rules, !status) {
-            console.error('errr')
+            swal({
+                title: "Fill All Fields",
+                icon: "warning",
+                buttons: {
+                    catch: {
+                        text: "Cancel",
+                        value: "catch",
+                    },
+                },
+            })
+
+        } else {
+            axios.post('http://localhost:3002/CreateProfiele', data).then((res, err) => {
+                if (err) throw err;
+                if (res) {
+                    setcretpop(!cretapop)
+                    swal({
+                        title: "Profile created",
+                        icon: "success",
+                        buttons: {
+                            catch: {
+                                text: "Cancel",
+                                value: "catch",
+                            }
+                        }
+                    })
+                }
+            })
         }
     }
+    useEffect(() => {
+        const arr = [];
+        axios.post('http://localhost:3002/allProfiles', { userId }).then((res, err) => {
+            if (res) {
+                res.data.status.forEach(item => {
+                    return [
+                        arr.push({
+                            key: item?._id,
+                            name: item?.name,
+                            category: item?.category,
+                            rules: item?.rules,
+                            tags: 'View rule',
+                        })
+                    ]
+                })
+                setdata(arr)
+            }
+            if (err) throw err;
+        }).catch((err) => {
+            console.log(err);
+        })
+    }, [openedit, cretapop])
+
+    useEffect(() => {
+        const containsKeyword = (val) => typeof val === "string" && val.indexOf(search) !== -1;
+        let filtered = data?.filter(entry => Object.keys(entry).map(key => entry[key]).some(containsKeyword));
+        search ? setrow(filtered) : setrow(data)
+    }, [search])
+
     return (
         <>
             <Page
@@ -113,16 +160,20 @@ function Profile(props) {
                 <Card>
                     <Card.Section>
                         <Stack >
-                            <TextField placeholder="Search Profile" />
+                            <TextField
+                                placeholder="Search Profile"
+                                value={search}
+                                onChange={(data) => setsearch(data)} />
                             <Button
                                 onClick={() => setcretpop(!cretapop)}>Create Profile</Button>
                         </Stack>
                     </Card.Section>
                     <Card.Section>
-                        <Table columns={columns} dataSource={data} />
+                        <Table columns={columns} dataSource={row ? row : data} />
                     </Card.Section>
                 </Card>
             </Page>
+            {/* craete profile modal */}
             <Modal
                 small
                 title="Create Your Profile"
@@ -146,7 +197,6 @@ function Profile(props) {
                                     Name
                                 </TextStyle>
                                 <TextField
-                                error={name}
                                     placeholder="Enter Name "
                                     value={addprofile?.name}
                                     onChange={(text) => {
@@ -157,12 +207,23 @@ function Profile(props) {
                                 <TextStyle variation="strong">
                                     Category
                                 </TextStyle>
-                                <TextField
-                                    placeholder="Enter Category "
+                                <Select
+                                    placeholder="Select Status"
+                                    options={[
+                                        {
+                                            label: "Default",
+                                            value: "default"
+                                        },
+                                        {
+                                            label: "Custom",
+                                            value: "custom"
+                                        }
+                                    ]}
                                     value={addprofile?.category}
                                     onChange={(text) => {
                                         setaddprofile({ ...addprofile, category: text })
                                     }} />
+
                             </Stack>
                             <Stack distribution="equalSpacing" alignment="center">
                                 <TextStyle variation="strong">
@@ -179,18 +240,8 @@ function Profile(props) {
                                 <TextStyle variation="strong">
                                     Status
                                 </TextStyle>
-                                <Select
-                                    placeholder="Select Status"
-                                    options={[
-                                        {
-                                            label: "Default",
-                                            value: "default"
-                                        },
-                                        {
-                                            label: "Custom",
-                                            value: "custom"
-                                        }
-                                    ]}
+                                <TextField
+                                    placeholder="Enter Category "
                                     value={addprofile?.status}
                                     onChange={(text) => {
                                         setaddprofile({ ...addprofile, status: text })
@@ -200,6 +251,12 @@ function Profile(props) {
                     </Card.Section>
                 </Card>
             </Modal>
+            <Editprofile
+                data={editmodaldata}
+                open={openedit}
+                close={setopenedit}
+            />
+
         </>
     )
 }

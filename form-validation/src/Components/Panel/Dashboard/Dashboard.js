@@ -8,9 +8,6 @@ import OngoingActivities from "./Components/OngoingActivities";
 import CompletedActivities from "./Components/CompletedActivities";
 
 function Dashboard(props) {
-    useEffect(() => {
-        props.setprofile(true)
-    }, [])
 
     return (
         <>

@@ -22,7 +22,7 @@ function App() {
       <Route path='login' element={<Login />} />
       <Route
         path='panel/*'
-        element={<Panel data={data?.data} />} />
+        element={<Panel data={data} />} />
       <Route path='*' element={<TextStyle>404 Page Not Found</TextStyle>} />
     </Routes >
   )

@@ -12,7 +12,6 @@ function ProductGrid(props) {
     const [column, setcolumn] = useState();
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-    console.log(action)
     const data = [
         {
             id: "id 1",
@@ -127,7 +126,6 @@ function ProductGrid(props) {
         cols.length > 0 && setcolumn(cols)
     }, [action])
 
-    console.log(selectedRowKeys)
 
     return (
         <Table
