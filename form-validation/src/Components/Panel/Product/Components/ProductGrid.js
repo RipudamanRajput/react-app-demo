@@ -1,72 +1,71 @@
-import { Stack } from "@shopify/polaris"
+import { Stack, Badge, Button, TextStyle } from "@shopify/polaris"
 import { Table } from "antd";
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserContext } from "../Product"
+import VarientGrid from "./VarientGrid";
 
 function ProductGrid(props) {
-    const profilepic = useSelector((state) => state.login.username.profilepic);
+    const history = useNavigate();
+    const { _id } = useSelector((state) => state.login.username);
+    const [loading, setloading] = useState(true);
     const { status, Search, action } = useContext(UserContext)
     const [row, setrow] = useState();
     const [column, setcolumn] = useState();
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [data, setrowdata] = useState([])
 
-    const data = [
-        {
-            id: "id 1",
-            key: 0,
-            shop_id: "2134612144546",
-            img: <img alt="img" src={profilepic} width="50px" height="50px" />,
-            price: 250,
-            status: "In Progress"
-        },
-        {
-            id: "id 1",
-            key: 1,
-            shop_id: "2134612144546",
-            img: <img alt="img" src={profilepic} width="50px" height="50px" />,
-            price: 250,
-            status: "Not Uploaded"
-        },
-        {
-            id: "id 1",
-            key: 2,
-            shop_id: "2134612144546",
-            img: <img alt="img" src={profilepic} width="50px" height="50px" />,
-            price: 250,
-            status: "Live"
-        },
-        {
-            id: "id 1",
-            key: 3,
-            shop_id: "2134612144546",
-            img: <img alt="img" src={profilepic} width="50px" height="50px" />,
-            price: 250,
-            status: "Live"
-        },
-        {
-            id: "id 1",
-            key: 4,
-            shop_id: "2134612144546",
-            img: <img alt="img" src={profilepic} width="50px" height="50px" />,
-            price: 250,
-            status: "Live"
-        },
-    ];
+
+    useEffect(() => {
+        axios.post("http://localhost:3002/getProducts", { id: _id }).then((res, err) => {
+            const ar = [];
+            res?.data.forEach(element => {
+                ar.push({
+                    key: element._id,
+                    _id: element._id,
+                    title: element.name,
+                    shop_id: element.shop_id,
+                    proimg: element.profilepic,
+                    img: <img src={element.profilepic} style={{ objectFit: "cover", borderRadius: "5px" }} width={60} height={60} />,
+                    price: element.price,
+                    varient: element.varient,
+                    status: element.status
+                })
+            });
+            setrowdata(ar);
+            setloading(false);
+        })
+    }, [])
+
+    const navigate = (data, location) => {
+        history(location, {
+            state: {
+                id: data?._id,
+                shop_id: data.shop_id,
+                title: data.title,
+                img: data.proimg,
+                price: data.price,
+                varient: data.varient,
+                status: data.status
+            }
+        })
+    }
 
     const col = [
         {
             title: "Id",
-            dataIndex: "id",
+            dataIndex: "_id",
             align: "center",
-            key: "id"
+            key: "id",
+            width: 200
         },
         {
-            title: "Shop Id",
-            dataIndex: "shop_id",
+            title: "Title",
+            dataIndex: "title",
             align: "center",
-            key: "shop id"
+            key: "title"
         },
         {
             title: "Image",
@@ -74,6 +73,14 @@ function ProductGrid(props) {
             align: "center",
             key: "image"
         },
+        {
+            title: "Shop Id",
+            dataIndex: "shop_id",
+            align: "center",
+            key: "shop id"
+        },
+
+
         {
             title: "Price",
             dataIndex: "price",
@@ -91,10 +98,11 @@ function ProductGrid(props) {
             dataIndex: "actions",
             key: "actions",
             align: "center",
-            render: () =>
+            render: (_, record) =>
                 <Stack distribution="center">
-                    <Link>View</Link>
-                    <Link>Edit</Link>
+                    <Button plain onClick={() => navigate(record, "Viewproduct")}>View</Button>
+                    <TextStyle>|</TextStyle>
+                    <Button plain onClick={() => navigate(record, "Editproduct")}>Edit</Button>
                 </Stack>
         }
     ];
@@ -104,17 +112,17 @@ function ProductGrid(props) {
             if (item.status == status) {
                 return item
             }
-            if (status == 'All') {
+            if (status == 'all') {
                 return item
             }
         })
-        ab.length > 0 && setrow(ab);
+        ab.length > 0 ? setrow(ab) : setrow([]);
     }, [status])
 
     useEffect(() => {
         const containsKeyword = (val) => typeof val === "string" && val.indexOf(Search) !== -1;
         let filtered = data.filter(entry => Object.keys(entry).map(key => entry[key]).some(containsKeyword));
-        Search ? setrow(filtered) : setrow(data)
+        (Search && filtered.length !==0) ? setrow(filtered) : setrow([])
     }, [Search])
 
     useEffect(() => {
@@ -126,19 +134,24 @@ function ProductGrid(props) {
         cols.length > 0 && setcolumn(cols)
     }, [action])
 
-
     return (
         <Table
             columns={column ? column : col}
-            dataSource={row ? row : data}
-            rowSelection={
-                {
-                    selectedRowKeys,
-                    onChange: (_, data) => {
-                        setSelectedRowKeys(data?.key);
-                    }
+            loading={loading}
+            dataSource={
+                row?.length > 0
+                    ? row
+                    : (status === "all") && data}
+            rowSelection={{
+                ...selectedRowKeys,
+                onChange: (_, data) => {
+                    setSelectedRowKeys(data);
                 }
-            } />
+            }}
+            expandable={{
+                expandedRowRender: (record) => { return <VarientGrid data={record.varient} /> },
+                rowExpandable: (record) => record.varient,
+            }} />
     )
 }
 export default ProductGrid;

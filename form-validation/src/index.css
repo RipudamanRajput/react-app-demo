@@ -133,3 +133,9 @@ span.varinet-image {
 span.varinet-image .Polaris-DropZone {
   min-height: fit-content;
 }
+
+/* product grid */
+td.ant-table-cell.ant-table-selection-column {
+  padding-left: 20px !important;
+  padding-right: 15px !important;
+}

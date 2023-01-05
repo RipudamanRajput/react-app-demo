@@ -29,7 +29,7 @@ function ProductGrid() {
                             choices={[
                                 {
                                     label: "Id",
-                                    value: "id",
+                                    value: "_id",
                                 },
                                 {
                                     label: "Shop ID",
