@@ -55,7 +55,7 @@ app.post('/create', (req, res) => {
     Insert(query).then((data, err) => {
         res.status(200).send({ data: data })
     })
-    detail.push(newDetail);
+    // detail.push(newDetail);
 });
 
 // ------- API for Login User
