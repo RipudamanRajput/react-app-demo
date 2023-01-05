@@ -16,16 +16,16 @@ function Product() {
     useEffect(() => {
         switch (selected) {
             case 0:
-                setStatus("All")
+                setStatus("all")
                 break;
             case 1:
-                setStatus("Not Uploaded")
+                setStatus("not_uploaded")
                 break;
             case 2:
-                setStatus("In Progress")
+                setStatus("in_progress")
                 break;
             case 3:
-                setStatus("Live")
+                setStatus("live")
                 break;
             default:
                 break;

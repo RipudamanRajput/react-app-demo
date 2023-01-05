@@ -8,13 +8,13 @@ function Find(data) {
         MongoClienrt.connect(Url, (err, db) => {
             if (err) throw err;
             var dbo = db.db(data?.dbname);
-            dbo.collection(data?.collection).find(data?.data).toArray((err, res) => {
+            dbo.collection(data?.collection).find(data.query ? data.query : data?.data).toArray((err, res) => {
                 if (err) {
                     reject(new Error(err))
+                    throw err;
                 }
                 resolve(res)
                 db.close();
-
             })
         })
     })
