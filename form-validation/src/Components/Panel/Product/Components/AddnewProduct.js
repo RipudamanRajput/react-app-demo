@@ -27,7 +27,7 @@ function AddnewProduct(title) {
                 shop_id: element?.shop_id,
                 price: element?.price,
                 status: element?.status,
-                // varientimg: element?.varientimg
+                varientimg: element?.varientimg
             })
         });
         if (ar.length > 0) {
@@ -44,7 +44,6 @@ function AddnewProduct(title) {
             })
         }
     }, [])
-
     const column = [
         {
             dataIndex: "varient_id",
@@ -133,34 +132,34 @@ function AddnewProduct(title) {
             title: "Image",
             render: (_, record, index) =>
                 <Stack>
-                    {data?.varient?.[index]?.varientimg ?
-                        <img width={"80px"} src={URL.createObjectURL(data?.varient?.[index]?.varientimg)} alt='product image' />
-                        :
-                        <span className="varinet-image">
-                            <DropZone
-                                allowMultiple={false}
-                                children={<img width={"80px"} alt='product image' />}
-                                onDrop={(
-                                    _dropFiles,
-                                    acceptedFiles,
-                                ) => {
-                                    if (_dropFiles) {
-                                        setdata({
-                                            ...data,
-                                            varient: {
-                                                ...data?.varient,
-                                                [index]: {
-                                                    ...data?.varient?.[index],
-                                                    varientimg: acceptedFiles[0],
-                                                }
-                                            }
-                                        })
-                                    }
-                                }}>
-                                <DropZone.FileUpload />
-                            </DropZone>
-                        </span>
+                    {data?.varient?.[index]?.varientimg &&
+                        <img width={"80px"} src={!data?.varient?.[index]?.varientimg?.name ? data?.varient?.[index]?.varientimg : URL.createObjectURL(data?.varient?.[index]?.varientimg)} alt={'product image'} />
                     }
+                    <span className="varinet-image">
+                        <DropZone
+                            allowMultiple={false}
+                            children={<img width={"80px"} alt='product image' />}
+                            onDrop={(
+                                _dropFiles,
+                                acceptedFiles,
+                            ) => {
+                                if (_dropFiles) {
+                                    setdata({
+                                        ...data,
+                                        varient: {
+                                            ...data?.varient,
+                                            [index]: {
+                                                ...data?.varient?.[index],
+                                                varientimg: acceptedFiles[0],
+                                            }
+                                        }
+                                    })
+                                }
+                            }}>
+                            <DropZone.FileUpload />
+                        </DropZone>
+                    </span>
+
                 </Stack>
 
         },
@@ -245,12 +244,14 @@ function AddnewProduct(title) {
                     if (!varient[elements]?.varientimg) {
                         Error("Kindly Select Varient Image")
                     }
-                    arr.push(
-                        {
-                            file: varient[elements]?.varientimg,
-                            name: varient[elements]?.varient_id
-                        }
-                    )
+                    if (varient[elements]?.varientimg.name) {
+                        arr.push(
+                            {
+                                file: varient[elements]?.varientimg,
+                                name: varient[elements]?.varient_id
+                            }
+                        )
+                    }
                 })
                 const files = (varient && thumb) ?
                     [...arr, { file: thumb, name: shop_id }]
@@ -270,11 +271,12 @@ function AddnewProduct(title) {
             } else {
                 formdata.append('productinfo', details);
             }
+            
             if (name, shop_id, price, status) {
                 if (Apiname === "update") {
-                    console.log(details,"dskjdask")
-                    axios.post('http://localhost:3002/updateProduct', data).then((res,err)=>{
-                        // console.log(res.data,"dsakjdsj")
+                    // console.log(details, "dskjdask")
+                    axios.post('http://localhost:3002/updateProduct', formdata).then((res, err) => {
+                        console.log(res.data,"dsakjdsj")
                     })
                 }
                 if (Apiname === "insert") {
