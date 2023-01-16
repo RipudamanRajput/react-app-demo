@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes, } from "react-router-dom";
 import SessionExpire from "../Emptystate/Sessionexpire";
-import MultiSelect from "../MultiSelect/Multiselect";
 import Dashboard from "./Dashboard/Dashboard";
 import AddnewProduct from "./Product/Components/AddnewProduct";
 import Viewproduct from "./Product/Components/ViewProduct";
@@ -61,9 +60,6 @@ function Panel(props: any) {
                             <Route
                                 path="/Products/Editproduct"
                                 element={<AddnewProduct title="Edit Product" />} />
-                            <Route
-                                path="/Multiselect"
-                                element={<MultiSelect />} />
                             <Route
                                 path="*"
                                 element={<TextStyle>404 page not found </TextStyle>} />
