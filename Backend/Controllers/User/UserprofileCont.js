@@ -26,7 +26,7 @@ module.exports =(req, res, next) => {
                 },
             })
         });
-        fs.readdir('uploads/Account', (err, files) => {
+        fs.readdir('uploads/Account', (err, files) => {y
             if (err) throw err;
             files.forEach((data) => {
                 if (data !== originalname) {
