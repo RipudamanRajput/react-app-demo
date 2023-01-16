@@ -16,6 +16,9 @@ const Updateproducts = require('./Routers/Products/Updateproducts');
 
 const app = express();
 
+app.use(express.static('./uploads/Products')); 
+app.use('/images', express.static('./uploads/Products'));
+
 app.use(
     cors({
         origin: 'http://localhost:3000',

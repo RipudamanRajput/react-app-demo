@@ -12,13 +12,11 @@ module.exports = (req, res) => {
             Object.keys(varient).forEach((data) => {
                 req?.files.filter((file, index) => {
                     if (varient[data].varient_id === file.originalname) {
-                        fs.readFile(file?.path, function (err, res) {
-                            varient[data]["varientimg"] = `data:image/png;base64,${Buffer.from(res).toString('base64')}`
-                            ar.push(varient[data])
-                            if (Object.keys(varient).length === ar.length) {
-                                resolve(ar)
-                            }
-                        })
+                        varient[data]["varientimg"] = `http://localhost:3002/images/${file.originalname}.png`
+                        ar.push(varient[data])
+                        if (Object.keys(varient).length === ar.length) {
+                            resolve(ar)
+                        }
                     }
                 })
             })
@@ -33,13 +31,11 @@ module.exports = (req, res) => {
             const ar = [];
             req?.files.filter((file, index) => {
                 if (shop_id === file?.originalname) {
-                    fs.readFile(file?.path, function (err, proimg) {
-                        ar.push(proimg);
-                        resolve(proimg)
-                        if (ar.length === 0) {
-                            rejects(new Error("No product Image"))
-                        }
-                    })
+                    ar.push(file?.originalname);
+                    resolve(file?.originalname)
+                    if (ar.length === 0) {
+                        rejects(new Error("No product Image"))
+                    }
                 }
             })
             var endTime = performance.now()
@@ -79,7 +75,7 @@ module.exports = (req, res) => {
                 price: price,
                 status: status,
                 varient: varientdata ? varientdata : varient,
-                profilepic: proimg ? `data:image/png;base64,${Buffer.from(proimg).toString('base64')}` : null
+                profilepic: proimg ? `http://localhost:3002/images/${proimg}.png` : null
             },
             dbname: "admin",
             collection: "Products"
